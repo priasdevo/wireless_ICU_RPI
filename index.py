@@ -16,7 +16,7 @@ def on_disconnect():
     print('Disconnected from server!')
 
 # Connect to the server
-sio.connect('http://fe80::d3c5:dfca:ec8b:168%10:5000')  # Replace with your website URL
+sio.connect('http://169.254.248.218:5000')  # Replace with your website URL
 
 try:
     while True:
