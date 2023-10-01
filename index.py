@@ -3,6 +3,11 @@ import time
 import cv2
 import base64
 import requests
+from gpiozero import MotionSensor
+
+pir = MotionSensor(5)
+motion_detected = False
+
 
 def compress_image(frame, jpeg_quality=50):
     # Resize image if needed (for example, reducing resolution by half)
@@ -40,7 +45,7 @@ else:
     print("Login failed:", response)
     exit()
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 
 @sio.on('connect')
 def on_connect():
@@ -78,13 +83,26 @@ try:
             break
         
         #_, buffer = cv2.imencode('.jpg', frame)
-        print('stream1')
         compressed_frame = compress_image_size(frame)
         buffer = compress_image(compressed_frame)
         encoded_image = base64.b64encode(buffer).decode('utf-8')
-        print('stream2')
 
         sio.emit('stream', encoded_image)
+
+        if pir.motion_detected and not motion_detected:
+            motion_detected = True
+            print("You moved")
+            # response = requests.post(url, json=data)
+            # if response.status_code == 200:
+            #     print("Motion alert sent successfully!")
+            # else:
+            #     print(f"Failed to send motion alert. Status Code: {response.status_code}")
+
+        # Reset the motion_detected flag if no motion is detected
+        elif not pir.motion_detected:
+            print("You moved not")
+            motion_detected = False
+
 except KeyboardInterrupt:
     pass
 finally:
