@@ -78,7 +78,7 @@ try:
             break
         
         #_, buffer = cv2.imencode('.jpg', frame)
-        compressed_frame = compress_image_size(frame, scale_factor=0.5)
+        compressed_frame = compress_image_size(frame)
         buffer = compress_image(compressed_frame)
         encoded_image = base64.b64encode(buffer).decode('utf-8')
 
