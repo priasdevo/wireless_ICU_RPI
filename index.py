@@ -12,7 +12,7 @@ def compress_image(frame, jpeg_quality=50):
     _, buffer = cv2.imencode('.jpg', frame, encode_param)
     return buffer
 
-def compress_image_size(frame, scale_factor=0.25):
+def compress_image_size(frame, scale_factor=0.05):
     # Resize the image by the scale factor (e.g., 0.5 will halve the resolution)
     new_width = int(frame.shape[1] * scale_factor)
     new_height = int(frame.shape[0] * scale_factor)
