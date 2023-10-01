@@ -12,7 +12,7 @@ def compress_image(frame, jpeg_quality=50):
     _, buffer = cv2.imencode('.jpg', frame, encode_param)
     return buffer
 
-def compress_image_size(frame, scale_factor=0.05):
+def compress_image_size(frame, scale_factor=0.5):
     # Resize the image by the scale factor (e.g., 0.5 will halve the resolution)
     new_width = int(frame.shape[1] * scale_factor)
     new_height = int(frame.shape[0] * scale_factor)
@@ -78,9 +78,11 @@ try:
             break
         
         #_, buffer = cv2.imencode('.jpg', frame)
+        print('stream1')
         compressed_frame = compress_image_size(frame)
         buffer = compress_image(compressed_frame)
         encoded_image = base64.b64encode(buffer).decode('utf-8')
+        print('stream2')
 
         sio.emit('stream', encoded_image)
 except KeyboardInterrupt:
