@@ -4,6 +4,15 @@ import cv2
 import base64
 import requests
 
+def compress_image(frame, jpeg_quality=75):
+    # Resize image if needed (for example, reducing resolution by half)
+    # frame = cv2.resize(frame, (int(frame.shape[1]*0.5), int(frame.shape[0]*0.5)))
+    
+    encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), jpeg_quality]
+    _, buffer = cv2.imencode('.jpg', frame, encode_param)
+    return buffer
+
+
 sio = socketio.Client()
 server_address = 'http://169.254.248.218:5000'
 login_endpoint = '/authDevice/authenticate'
@@ -60,7 +69,8 @@ try:
             print("Failed to grab frame")
             break
         
-        _, buffer = cv2.imencode('.jpg', frame)
+        #_, buffer = cv2.imencode('.jpg', frame)
+        buffer = compress_image(frame)
         encoded_image = base64.b64encode(buffer).decode('utf-8')
 
         sio.emit('stream', encoded_image)
