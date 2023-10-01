@@ -4,7 +4,7 @@ import cv2
 import base64
 import requests
 
-def compress_image(frame, jpeg_quality=25):
+def compress_image(frame, jpeg_quality=5):
     # Resize image if needed (for example, reducing resolution by half)
     # frame = cv2.resize(frame, (int(frame.shape[1]*0.5), int(frame.shape[0]*0.5)))
     
