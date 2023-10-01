@@ -4,13 +4,21 @@ import cv2
 import base64
 import requests
 
-def compress_image(frame, jpeg_quality=5):
+def compress_image(frame, jpeg_quality=50):
     # Resize image if needed (for example, reducing resolution by half)
     # frame = cv2.resize(frame, (int(frame.shape[1]*0.5), int(frame.shape[0]*0.5)))
     
     encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), jpeg_quality]
     _, buffer = cv2.imencode('.jpg', frame, encode_param)
     return buffer
+
+def compress_image_size(frame, scale_factor=0.25):
+    # Resize the image by the scale factor (e.g., 0.5 will halve the resolution)
+    new_width = int(frame.shape[1] * scale_factor)
+    new_height = int(frame.shape[0] * scale_factor)
+    resized_frame = cv2.resize(frame, (new_width, new_height))
+    
+    return resized_frame
 
 
 sio = socketio.Client()
@@ -70,7 +78,8 @@ try:
             break
         
         #_, buffer = cv2.imencode('.jpg', frame)
-        buffer = compress_image(frame)
+        compressed_frame = compress_image_size(frame, scale_factor=0.5)
+        buffer = compress_image(compressed_frame)
         encoded_image = base64.b64encode(buffer).decode('utf-8')
 
         sio.emit('stream', encoded_image)
