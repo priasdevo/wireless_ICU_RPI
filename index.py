@@ -3,11 +3,11 @@ import time
 import cv2
 import base64
 import requests
-# from gpiozero import MotionSensor
+from gpiozero import MotionSensor
 
-# pir = MotionSensor(5)
+pir = MotionSensor(5)
 motion_detected = False
-pir = False
+# pir = False
 
 
 def compress_image(frame, jpeg_quality=50):
