@@ -28,7 +28,7 @@ def compress_image_size(frame, scale_factor=0.5):
 
 
 sio = socketio.Client()
-server_address = 'http://10.202.204.93:5000'
+server_address = 'http://169.254.248.218:5000'
 login_endpoint = '/authDevice/authenticate'
 socket_authen = False
 receive_setting = False
@@ -81,7 +81,7 @@ def on_authen_success(data):
     receive_setting = True
 
 # Connect to the server 169.254.248.218
-sio.connect('http://10.202.204.93:5000')  # Replace with your website URL
+sio.connect('http://169.254.248.218:5000')  # Replace with your website URL
 
 while not socket_authen:
     sio.emit('authenticate',response_data)
