@@ -113,9 +113,10 @@ try:
         # if(x==100):
         #     sio.emit('movement_detected')
 
-        if pir.motion_detected and not isHome:
+        if pir.motion_detected and not isHome and not motion_detected:
             motion_detected = True
             print("You moved")
+            sio.emit('movement_detected', encoded_image)
 
 
         #Reset the motion_detected flag if no motion is detected
