@@ -3,10 +3,11 @@ import time
 import cv2
 import base64
 import requests
-from gpiozero import MotionSensor
+# from gpiozero import MotionSensor
 
-pir = MotionSensor(5)
+# pir = MotionSensor(5)
 motion_detected = False
+pir = False
 
 
 def compress_image(frame, jpeg_quality=50):
@@ -27,9 +28,11 @@ def compress_image_size(frame, scale_factor=0.5):
 
 
 sio = socketio.Client()
-server_address = 'http://169.254.248.218:5000'
+server_address = 'http://10.202.204.93:5000'
 login_endpoint = '/authDevice/authenticate'
 socket_authen = False
+receive_setting = False
+isHome = True
 
 login_data = {
     'macAddress': '23:a7:14:9c:b0:ed',
@@ -47,13 +50,16 @@ else:
 
 cap = cv2.VideoCapture(0)
 
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+
 @sio.on('connect')
 def on_connect():
     print('Connected to server!')
 
 @sio.on('message')
 def on_message(data):
-    print('Message from server:', data)
+    print('Message from server:', data) 
 
 @sio.on('disconnect')
 def on_disconnect():
@@ -65,15 +71,29 @@ def on_authen_success():
     print('Authen confirm from server!')
     socket_authen = True
 
-# Connect to the server
-sio.connect('http://169.254.248.218:5000')  # Replace with your website URL
+@sio.on('identify_success')
+def on_authen_success(data):
+    global receive_setting  # Declare the variable as global
+    global isHome
+    print('Identify confirm from server!',data)
+    
+    isHome = data
+    receive_setting = True
+
+# Connect to the server 169.254.248.218
+sio.connect('http://10.202.204.93:5000')  # Replace with your website URL
 
 while not socket_authen:
     sio.emit('authenticate',response_data)
     time.sleep(2)
 
-sio.emit('identify_streamer')
-print("Confirm socket login")
+while not receive_setting:
+    sio.emit('identify_streamer')
+    time.sleep(2)
+
+print("Confirm socket login",isHome)
+
+x = 0
 
 try:
     while True:
@@ -82,23 +102,23 @@ try:
             print("Failed to grab frame")
             break
         
-        #_, buffer = cv2.imencode('.jpg', frame)
-        compressed_frame = compress_image_size(frame)
-        buffer = compress_image(compressed_frame)
+        _, buffer = cv2.imencode('.jpg', frame)
+        # compressed_frame = compress_image_size(frame)
+        # buffer = compress_image(compressed_frame)
         encoded_image = base64.b64encode(buffer).decode('utf-8')
 
         sio.emit('stream', encoded_image)
 
-        if pir.motion_detected and not motion_detected:
+        # x = x+1
+        # if(x==100):
+        #     sio.emit('movement_detected')
+
+        if pir.motion_detected and not isHome:
             motion_detected = True
             print("You moved")
-            # response = requests.post(url, json=data)
-            # if response.status_code == 200:
-            #     print("Motion alert sent successfully!")
-            # else:
-            #     print(f"Failed to send motion alert. Status Code: {response.status_code}")
 
-        # Reset the motion_detected flag if no motion is detected
+
+        #Reset the motion_detected flag if no motion is detected
         elif not pir.motion_detected:
             print("You moved not")
             motion_detected = False
