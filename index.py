@@ -80,7 +80,7 @@ def on_authen_success(data):
     isHome = data
     receive_setting = True
 
-@sio('isHome_Change')
+@sio.on('isHome_Change')
 def on_Home_Change(data):
     global isHome
     isHome = data
