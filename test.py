@@ -5,9 +5,9 @@ import base64
 import requests
 from gpiozero import MotionSensor
 
-pir = MotionSensor(5)
+# pir = MotionSensor(5)
 motion_detected = False
-# pir = False
+pir = False
 
 
 def compress_image(frame, jpeg_quality=50):
@@ -28,7 +28,7 @@ def compress_image_size(frame, scale_factor=0.5):
 
 
 sio = socketio.Client()
-server_address = 'http://192.168.43.119:5000'
+server_address = 'http://localhost:5000'
 login_endpoint = '/authDevice/authenticate'
 socket_authen = False
 receive_setting = False
@@ -80,13 +80,8 @@ def on_authen_success(data):
     isHome = data
     receive_setting = True
 
-@sio('isHome_Change')
-def on_Home_Change(data):
-    global isHome
-    isHome = data
-
 # Connect to the server 169.254.248.218
-sio.connect('http://192.168.43.119:5000')  # Replace with your website URL
+sio.connect('http://localhost:5000')  # Replace with your website URL
 
 while not socket_authen:
     sio.emit('authenticate',response_data)
@@ -114,20 +109,20 @@ try:
 
         sio.emit('stream', encoded_image)
 
-        # x = x+1
-        # if(x==100):
-        #     sio.emit('movement_detected')
+        x = x+1
+        if(x==300):
+            sio.emit('movement_detected')
 
-        if pir.motion_detected and not isHome and not motion_detected:
-            motion_detected = True
-            print("You moved")
-            sio.emit('movement_detected', encoded_image)
+        # if pir.motion_detected and not isHome and not motion_detected:
+        #     motion_detected = True
+        #     print("You moved")
+        #     sio.emit('movement_detected', encoded_image)
 
 
         #Reset the motion_detected flag if no motion is detected
-        elif not pir.motion_detected:
-            print("You moved not")
-            motion_detected = False
+        # elif not pir.motion_detected:
+        #     print("You moved not")
+        #     motion_detected = False
 
 except KeyboardInterrupt:
     pass
